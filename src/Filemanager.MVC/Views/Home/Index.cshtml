@@ -1,0 +1,50 @@
+﻿@{
+    ViewBag.Title = "Filemanager.MVC";
+}
+
+@Scripts.Render("~/bundles/tinymce")
+@Scripts.Render("~/Scripts/tinymce/plugins/image/plugin.min.js")
+
+<div class="jumbotron">
+    <h1>Filemanager.MVC</h1>
+    @Html.TextArea("tinymce")
+</div>
+
+@section scripts
+{
+    <script>
+        tinymce.init({
+            selector: 'textarea',
+            plugins: 'image',
+            relative_urls: false,
+            remove_script_host: true,
+            document_base_url: "localhost/Content/",
+            file_browser_callback: function(field_name, url, type, win) {
+
+                // from http://andylangton.co.uk/blog/development/get-viewport-size-width-and-height-javascript
+                var w = window,
+                    d = document,
+                    e = d.documentElement,
+                    g = d.getElementsByTagName('body')[0],
+                    x = w.innerWidth || e.clientWidth || g.clientWidth,
+                    y = w.innerHeight || e.clientHeight || g.clientHeight;
+
+                var cmsURL = '/Scripts/filemanager/index.html?&field_name=' + field_name + '&lang=' + tinymce.settings.language;
+
+                if (type == 'image') {
+                    cmsURL = cmsURL + "&type=images";
+                }
+
+                tinyMCE.activeEditor.windowManager.open({
+                    file: cmsURL,
+                    title: 'Filemanager',
+                    width: x * 0.8,
+                    height: y * 0.8,
+                    resizable: "yes",
+                    close_previous: "no"
+                });
+
+            }
+        });
+    </script>
+}
