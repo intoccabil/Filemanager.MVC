@@ -197,6 +197,9 @@
     <Content Include="Scripts\filemanager\scripts\CodeMirror\package.json" />
     <Content Include="Scripts\filemanager\scripts\CodeMirror\README.md" />
     <Content Include="Scripts\filemanager\scripts\filemanager.config.js.default" />
+    <Content Include="Scripts\filemanager\scripts\filemanager.min.js.map">
+      <DependentUpon>filemanager.min.js</DependentUpon>
+    </Content>
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\filemanager\images\accept.png" />
     <Content Include="Scripts\filemanager\images\ajax-loader.gif" />
@@ -626,7 +629,9 @@
     <Content Include="Scripts\filemanager\scripts\filemanager.js" />
     <Content Include="Scripts\filemanager\scripts\filemanager.liveSearch.js" />
     <Content Include="Scripts\filemanager\scripts\filemanager.liveSearch.min.js" />
-    <Content Include="Scripts\filemanager\scripts\filemanager.min.js" />
+    <Content Include="Scripts\filemanager\scripts\filemanager.min.js">
+      <DependentUpon>filemanager.js</DependentUpon>
+    </Content>
     <Content Include="Scripts\filemanager\scripts\jquery-1.8.3.min.js" />
     <Content Include="Scripts\filemanager\scripts\jquery.contextmenu\images\cut.png" />
     <Content Include="Scripts\filemanager\scripts\jquery.contextmenu\images\door.png" />

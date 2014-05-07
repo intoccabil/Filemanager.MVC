@@ -37,6 +37,10 @@ namespace MyProject.Areas.FilemanagerArea.Controllers
 
                 _imgExtensions = new DynamicJsonArray(configuration["images"]["imagesExt"]).Select(
                     ext => ext.ToString().Insert(0, ".")).ToList();
+
+                _resizeInfo = new KeyValuePair<bool, Size>(configuration["images"]["resize"]["enabled"], 
+                    new Size(configuration["images"]["resize"]["maxWidth"], 
+                        configuration["images"]["resize"]["maxHeight"]));
             }
             catch (Exception)
             {
@@ -102,6 +106,12 @@ namespace MyProject.Areas.FilemanagerArea.Controllers
                 _imgExtensions = new List<string> { ".jpg", ".png", ".jpeg", ".gif", ".bmp" };
             }
         }
+
+        /// <summary>
+        /// Key corresponds to resize in configuration.
+        /// Value corresponds to dimensional constraints (maxWidth and maxHeight).
+        /// </summary>
+        private readonly KeyValuePair<bool, Size> _resizeInfo;
 
         private readonly string _filemanagerPath = WebConfigurationManager.AppSettings["Filemanager_Path"] ??
                                                    "/Scripts/filemanager/";
@@ -263,7 +273,22 @@ namespace MyProject.Areas.FilemanagerArea.Controllers
                             baseFileName = Regex.Replace(baseFileName, @"_[\d]+$", string.Empty);
                             filePath = Path.Combine(path, baseFileName + "_" + i + Path.GetExtension(file.FileName));
                         }
-                        file.SaveAs(Server.MapPath(filePath));
+
+                        WebImage image = WebImage.GetImageFromRequest();
+
+                        if (_resizeInfo.Key && (image.Width > _resizeInfo.Value.Width || image.Height > _resizeInfo.Value.Height))
+                        {
+                            // TODO: Rewrite it, bug in WebImage.
+                            image.Resize(_resizeInfo.Value.Width, _resizeInfo.Value.Height, true, true)
+                                .Crop(1, 1)
+                                .Save(Server.MapPath(filePath));
+                        }
+                        else
+                        {
+                            image.Save(Server.MapPath(filePath));
+
+                            // file.SaveAs(Server.MapPath(filePath));
+                        }
 
                         response = _json.Serialize(new
                         {

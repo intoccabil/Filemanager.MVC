@@ -81,9 +81,9 @@
             "svg"
         ],
         "resize": {
-        	"enabled":true,
-        	"maxWidth": 800,
-            "maxHeight": 1600
+        	"enabled": true,
+        	"maxWidth": 200,
+            "maxHeight": 200
         }
     },
     "videos": {
