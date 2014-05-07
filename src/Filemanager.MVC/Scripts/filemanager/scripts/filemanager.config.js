@@ -17,7 +17,7 @@
         "chars_only_latin": true,
         "dateFormat": "d M Y H:i",
         "serverRoot": true,
-        "fileRoot": "Content/images/upload/",
+        "fileRoot": "/Content/images/upload/",
         "relPath": false,
         "logger": false,
         "capabilities": ["select", "download", "rename", "move", "delete", "replace"],

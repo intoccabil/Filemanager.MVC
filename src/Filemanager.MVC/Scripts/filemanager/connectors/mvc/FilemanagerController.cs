@@ -104,7 +104,7 @@ namespace MyProject.Areas.FilemanagerArea.Controllers
         }
 
         private readonly string _filemanagerPath = WebConfigurationManager.AppSettings["Filemanager_Path"] ??
-                                           "/Scripts/filemanager/";
+                                                   "/Scripts/filemanager/";
 
         private readonly string _configPath = WebConfigurationManager.AppSettings["Filemanager_ConfigPath"] ??
                                               "~/Scripts/filemanager/scripts/filemanager.config.js";
