@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -108,8 +109,8 @@ namespace MyProject.Areas.FilemanagerArea.Controllers
         }
 
         /// <summary>
-        /// Key corresponds to resize in configuration.
-        /// Value corresponds to dimensional constraints (maxWidth and maxHeight).
+        ///     Key corresponds to resize in configuration.
+        ///     Value corresponds to dimensional constraints (maxWidth and maxHeight).
         /// </summary>
         private readonly KeyValuePair<bool, Size> _resizeInfo;
 
@@ -274,20 +275,22 @@ namespace MyProject.Areas.FilemanagerArea.Controllers
                             filePath = Path.Combine(path, baseFileName + "_" + i + Path.GetExtension(file.FileName));
                         }
 
-                        WebImage image = WebImage.GetImageFromRequest();
-
-                        if (_resizeInfo.Key && (image.Width > _resizeInfo.Value.Width || image.Height > _resizeInfo.Value.Height))
+                        if (_imgExtensions.Contains(Path.GetExtension(file.FileName)))
                         {
-                            // TODO: Rewrite it, bug in WebImage.
-                            image.Resize(_resizeInfo.Value.Width, _resizeInfo.Value.Height, true, true)
-                                .Crop(1, 1)
-                                .Save(Server.MapPath(filePath));
+                            Image image = Image.FromStream(file.InputStream, true, true);
+
+                            if (_resizeInfo.Key &&
+                                (image.Width > _resizeInfo.Value.Width || image.Height > _resizeInfo.Value.Height))
+                            {
+                                image = ResizeImage(image, _resizeInfo.Value);
+                            }
+
+                            image.Save(Server.MapPath(filePath));
+                            image.Dispose();
                         }
                         else
                         {
-                            image.Save(Server.MapPath(filePath));
-
-                            // file.SaveAs(Server.MapPath(filePath));
+                            file.SaveAs(Server.MapPath(filePath));
                         }
 
                         response = _json.Serialize(new
@@ -727,7 +730,26 @@ namespace MyProject.Areas.FilemanagerArea.Controllers
             {
                 return Error("File to replace not found.");
             }
-            file.SaveAs(fi.FullName);
+
+            if (_imgExtensions.Contains(Path.GetExtension(file.FileName)))
+            {
+                Image image = Image.FromStream(file.InputStream, true, true);
+
+                if (_resizeInfo.Key &&
+                    (image.Width > _resizeInfo.Value.Width || image.Height > _resizeInfo.Value.Height))
+                {
+                    image = ResizeImage(image, _resizeInfo.Value);
+                }
+
+                image.Save(Server.MapPath(path));
+                image.Dispose();
+            }
+            else
+            {
+                file.SaveAs(Server.MapPath(path));
+            }
+
+            // file.SaveAs(fi.FullName);
 
             return "<textarea>" + _json.Serialize(new
             {
@@ -736,6 +758,30 @@ namespace MyProject.Areas.FilemanagerArea.Controllers
                 Error = "No error", 
                 Code = 0
             }) + "</textarea>";
+        }
+
+        private static Image ResizeImage(Image imgToResize, Size size)
+        {
+            double newPercentWidth = (size.Width / (double)imgToResize.Width);
+            double newPercentHeight = (size.Height / (double)imgToResize.Height);
+
+            double newPercent = newPercentHeight < newPercentWidth ? newPercentHeight : newPercentWidth;
+
+            var destWidth = (int)(imgToResize.Width * newPercent);
+            var destHeight = (int)(imgToResize.Height * newPercent);
+
+            var bitmap = new Bitmap(destWidth, destHeight);
+            Graphics g = Graphics.FromImage(bitmap);
+
+            g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+            g.SmoothingMode = SmoothingMode.HighQuality;
+            g.CompositingQuality = CompositingQuality.HighQuality;
+            g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+            g.DrawImage(imgToResize, 0, 0, destWidth, destHeight);
+            g.Dispose();
+
+            return bitmap;
         }
     }
 }

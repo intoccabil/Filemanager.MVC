@@ -82,8 +82,8 @@
         ],
         "resize": {
         	"enabled": true,
-        	"maxWidth": 200,
-            "maxHeight": 200
+        	"maxWidth": 800,
+            "maxHeight": 1600
         }
     },
     "videos": {
