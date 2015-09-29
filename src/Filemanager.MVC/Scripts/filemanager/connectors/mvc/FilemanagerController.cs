@@ -29,7 +29,10 @@ namespace MyProject.Areas.FilemanagerArea.Controllers
                 dynamic configuration = _json.DeserializeObject(
                     System.IO.File.ReadAllText(System.Web.HttpContext.Current.Server.MapPath(_configPath)));
 
-                _rootPath = configuration["options"]["fileRoot"];
+                _rootPath = configuration["options"]["fileRoot"] == false ?
+                    WebConfigurationManager.AppSettings["Filemanager_RootPath"] :
+                    configuration["options"]["fileRoot"];
+
                 _iconDirectory = Path.Combine(_filemanagerPath, configuration["icons"]["path"]);
 
                 _allowedExtensions =
